@@ -362,14 +362,16 @@ preloadedImages.forEach(img => {
 </footer>
 
 <script>
-  // Days to go counter
-  const targetDate = new Date('2026-04-25');
+  // April 25, 2026, 00:00 Eastern Time (EDT, UTC-4)
+  const targetDate = new Date(Date.UTC(2026, 3, 25, 4, 0, 0)); // Months are 0-indexed
+
   function updateDaysToGo() {
     const now = new Date();
     const diffTime = targetDate - now;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     document.getElementById('daysToGo').textContent = `${diffDays} days to go!`;
   }
+
   updateDaysToGo();
   setInterval(updateDaysToGo, 1000 * 60 * 60); // update hourly
 </script>
