@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selig & Anna — Wedding RSVP</title>
+  <style>
+    :root {
+      --primary: #b58b7a;
+      --accent: #e07a5f;
+      --bg: #fafafa;
+      --soft: #f3e8e3;
+      --danger: #b00020;
+      --button-hover: #a37767;
+      --secondary-btn: #f3e8e3;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .petal {
+      position: fixed;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      background: rgba(224,122,95,0.6);
+      border-radius: 50% 50% 50% 0;
+      animation: fall linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      padding: 4rem 1rem 3rem;
+      background: linear-gradient(135deg, var(--soft), #fff);
+      z-index: 1;
+    }
+
+    .save-date {
+      font-size: 1rem;
+      letter-spacing: 3px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .date {
+      font-size: 2.8rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+
+    .location {
+      font-size: 1.2rem;
+      color: #555;
+    }
+
+    .days-to-go {
+      font-size: 1rem;
+      color: var(--accent);
+      margin-top: 0.5rem;
+    }
+
+	.couple-photo {
+	  width: 300px;           /* fixed width */
+	  height: 300px;          /* fixed height */
+	  margin: 2rem auto;
+	  border-radius: 50%;     /* circle */
+	  display: block;
+	  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+	  object-fit: cover;      /* fills the container, keeps aspect ratio */
+	  transition: opacity 1s ease-in-out; /* smooth fade for cycling */
+	 }
+
+    section {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 1;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .event img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .map {
+      width: 100%;
+      height: 200px;
+      border: 0;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+    }
+
+    .highlight {
+      color: var(--danger);
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    td {
+      padding: 0.5rem 0;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 0.3rem;
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      font-size: 1.5rem;
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+      background: var(--button-hover);
+    }
+
+    .add-guest-btn, .remove-guest-btn {
+      background: var(--secondary-btn);
+      color: #333;
+      border-radius: 8px;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      margin-right: 1rem;
+    }
+
+    .add-guest-btn:hover, .remove-guest-btn:hover {
+      background: #eae1de;
+    }
+
+    .guest {
+      border-top: 1px solid #eee;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #777;
+    }
+
+    @media (max-width: 700px) {
+      .event {
+        grid-template-columns: 1fr;
+      }
+    }
+				
+	#photoCanvas {
+		pointer-events: none; /* disables mouse interactions entirely */
+	}
+
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="save-date">SAVE THE DATE</div>
+  <h1>Selig & Anna</h1>
+  <div class="date">Saturday, April 25, 2026</div>
+  <div class="location">Toronto, ON, Canada</div>
+  <div class="days-to-go" id="daysToGo"></div>
+</header>
+
+<div class="photo-container">
+  <canvas id="photoCanvas" width="300" height="300"></canvas>
+</div>
+
+<style>
+.photo-container {
+  width: 300px;
+  height: 300px;
+  margin: 2rem auto;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+#photoCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+</style>
+
+<script>
+const canvas = document.getElementById('photoCanvas');
+const ctx = canvas.getContext('2d');
+
+const photos = [
+  'SeligAnnaSplash.png',
+  'SeligAnnaSplash2.png',
+  'SeligAnnaSplash3.png',
+  'SeligAnnaSplash4.png',
+  'SeligAnnaSplash5.png'
+];
+
+let index = 0;
+let opacity = 1; // start fully visible
+let fadingIn = false; // first image already fully visible
+
+// Preload all images
+const preloadedImages = photos.map(src => {
+  const img = new Image();
+  img.src = src;
+  return img;
+});
+
+// Draw image
+function drawImage() {
+  const img = preloadedImages[index];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = opacity;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 1;
+}
+
+// Fade animation
+function animateFade() {
+  if (fadingIn) {
+    opacity += 0.05;
+    if (opacity >= 1) {
+      opacity = 1;
+      fadingIn = false;
+      setTimeout(nextImage, 3000); // keep fully visible
+      return;
+    }
+  } else {
+    opacity -= 0.05;
+    if (opacity <= 0) {
+      opacity = 0;
+      fadingIn = true;
+      index = (index + 1) % preloadedImages.length;
+    }
+  }
+  drawImage();
+  requestAnimationFrame(animateFade);
+}
+
+// Start next image fade
+function nextImage() {
+  fadingIn = false;
+  requestAnimationFrame(animateFade);
+}
+
+// Wait for all images to load before starting
+let loadedCount = 0;
+preloadedImages.forEach(img => {
+  img.onload = () => {
+    loadedCount++;
+    if (loadedCount === preloadedImages.length) {
+      // Draw first image fully visible
+      drawImage();
+      // Start fade animation after display duration
+      setTimeout(nextImage, 3000);
+    }
+  };
+});
+</script>
+
+<!-- I can't believe you are looking at this Herbert To / Charles Tang -->
+
+<section>
+  <h2>Wedding Ceremony — 1:00 PM</h2>
+  <div class="event">
+    <img src="https://chinesemartyrs.archtoronto.org/siteassets/media/images/church/cmcc-church.jpg" alt="Chinese Martyrs Catholic Church" />
+    <div>
+      <p>The Chinese Martyrs Catholic Church<br />2755 Denison St, Markham, ON L3S 2J3</p>
+      <iframe class="map" loading="lazy" src="https://www.google.com/maps?q=The+Chinese+Martyrs+Catholic+Church,+2755+Denison+St,+Markham,+ON&output=embed"></iframe>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Wedding Reception — 7:00 PM</h2>
+  <div class="event">
+    <img src="https://jumbolobster.ca/wp-content/uploads/2024/08/WechatIMG40-e1725027614737.jpeg" alt="Jumbo Lobster Restaurant" />
+    <div>
+      <p>Jumbo Lobster Clubhouse<br />9019 Leslie St, Richmond Hill, ON L4B 4A3</p>
+      <p class="highlight">Seafood-focused menu — allergy notice required in advance</p>
+      <iframe class="map" loading="lazy" src="https://www.google.com/maps?q=Jumbo+Lobster+Restaurant,+9019+Leslie+St,+Richmond+Hill,+ON&output=embed"></iframe>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>RSVP</h2>
+  <p>Please respond by <strong>Feb 28, 2026</strong>.</p>
+
+  <form id="rsvpForm">
+    <div id="guests"></div>
+    <button class="add-guest-btn" type="button" onclick="addGuest()">Add Guest</button>
+    <button class="remove-guest-btn" type="button" onclick="removeGuest()" style="display:none">Remove Guest</button>
+    <button class="submit-btn" type="submit">📧 Send RSVP</button>
+  </form>
+</section>
+
+<footer>
+  <p>2026-04-25</p>
+  	  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+	  <style>
+		.handwriting {
+		  font-family: 'Great Vibes', cursive; /* make sure this matches the imported font */
+		  font-size: 2rem;
+		  color: #444;
+		  letter-spacing: 1px;
+		}
+	  </style>
+  <p class="handwriting">We look forward to seeing you</p>
+</footer>
+
+<script>
+  // Days to go counter
+  const targetDate = new Date('2026-04-25');
+  function updateDaysToGo() {
+    const now = new Date();
+    const diffTime = targetDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    document.getElementById('daysToGo').textContent = `${diffDays} days to go!`;
+  }
+  updateDaysToGo();
+  setInterval(updateDaysToGo, 1000 * 60 * 60); // update hourly
+</script>
+
+<script>
+  const maxGuests = 6;
+  const guestsDiv = document.getElementById('guests');
+
+  function createGuest(index) {
+    const div = document.createElement('div');
+    div.className = 'guest';
+    const isPrimary = index === 0;
+
+    div.innerHTML = `
+      <h3>Guest ${index + 1}</h3>
+      <label>Name</label>
+      <input type="text" required />
+      ${isPrimary ? `<label>Email</label><input type="email" required /><small>A confirmation will be sent to this email address.</small>` : '<small style="color:#777">Attendance defaults to Guest 1. You may adjust if different.</small>'}
+      <table>
+        <tr><td colspan="2"><strong>Attendance</strong></td></tr>
+        <tr><td>Wedding Ceremony</td><td align="right"><input type="checkbox" class="ceremony"></td></tr>
+        <tr><td>Wedding Reception</td><td align="right"><input type="checkbox" class="reception" onchange="toggleReception(this)"></td></tr>
+        <tr class="allergy-row" style="display:none"><td style="padding-left:1.2rem; color:#b00020">↳ Food Allergies / Dietary Restrictions</td><td align="right"><input type="checkbox" onchange="toggleAllergy(this)"></td></tr>
+      </table>
+      <textarea placeholder="Please describe allergies or dietary restrictions" style="display:none"></textarea>
+    `;
+
+    return div;
+  }
+
+  function toggleReception(cb) {
+    const guest = cb.closest('.guest');
+    const allergyRow = guest.querySelector('.allergy-row');
+    const allergyCheckbox = allergyRow.querySelector('input');
+    const textarea = guest.querySelector('textarea');
+    if (cb.checked) {
+      allergyRow.style.display = 'table-row';
+    } else {
+      allergyRow.style.display = 'none';
+      allergyCheckbox.checked = false;
+      textarea.style.display = 'none';
+    }
+  }
+
+  function toggleAllergy(cb) {
+    const textarea = cb.closest('.guest').querySelector('textarea');
+    textarea.style.display = cb.checked ? 'block' : 'none';
+  }
+
+  function updateGuestButtons() {
+    const addBtn = document.querySelector('.add-guest-btn');
+    const removeBtn = document.querySelector('.remove-guest-btn');
+    const numGuests = guestsDiv.children.length;
+
+    addBtn.style.display = numGuests >= maxGuests ? 'none' : 'inline-block';
+    removeBtn.style.display = numGuests > 1 ? 'inline-block' : 'none';
+  }
+
+  function addGuest() {
+    if (guestsDiv.children.length >= maxGuests) return;
+
+    const guest = createGuest(guestsDiv.children.length);
+    guestsDiv.appendChild(guest);
+
+    if (guestsDiv.children.length > 1) {
+      const first = guestsDiv.children[0];
+      guest.querySelector('.ceremony').checked = first.querySelector('.ceremony').checked;
+      guest.querySelector('.reception').checked = first.querySelector('.reception').checked;
+      toggleReception(guest.querySelector('.reception'));
+    }
+
+    updateGuestButtons();
+  }
+
+  function removeGuest() {
+    if (guestsDiv.children.length <= 1) return;
+
+    guestsDiv.removeChild(guestsDiv.lastChild);
+    updateGuestButtons();
+  }
+
+  // Initialize form with one guest
+  addGuest();
+
+
+  // Falling petals
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = 8 + Math.random() * 5 + 's';
+    p.style.opacity = Math.random();
+    document.body.appendChild(p);
+  }
+
+  // Form validation to ensure each guest selects at least one event
+  document.getElementById("rsvpForm").addEventListener("submit", function(e) {
+    const guests = document.querySelectorAll(".guest");
+    for (let i = 0; i < guests.length; i++) {
+      const ceremony = guests[i].querySelector(".ceremony").checked;
+      const reception = guests[i].querySelector(".reception").checked;
+      if (!ceremony && !reception) {
+        e.preventDefault();
+        alert(`Guest ${i + 1} must select at least one event: Wedding Ceremony or Wedding Reception.`);
+        return false;
+      }
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  (function() {
+    emailjs.init("8RWPaRu0yrzOTzsLf");
+  })();
+</script>
+<script>
+document.getElementById("rsvpForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const guests = document.querySelectorAll(".guest");
+  let guestList = "";
+  let allergyNotes = "";
+  let ceremonyCount = 0;
+  let receptionCount = 0;
+
+  const primaryEmail = guests[0].querySelector("input[type='email']").value;
+
+  for (let i = 0; i < guests.length; i++) {
+    const name = guests[i].querySelector("input[type='text']").value;
+    const ceremony = guests[i].querySelector(".ceremony").checked;
+    const reception = guests[i].querySelector(".reception").checked;
+    const allergyBox = guests[i].querySelector("textarea");
+    const allergyText = allergyBox && allergyBox.style.display !== "none"
+      ? allergyBox.value
+      : "";
+
+    if (!ceremony && !reception) {
+      alert(`Guest ${i + 1} must attend at least one event.`);
+      return;
+    }
+
+    if (ceremony) ceremonyCount++;
+    if (reception) receptionCount++;
+
+    guestList += `• ${name} — `;
+    guestList += ceremony ? "Ceremony " : "";
+    guestList += reception ? "Reception " : "";
+    guestList += "\n";
+
+    if (allergyText) {
+      allergyNotes += `${name}: ${allergyText}\n`;
+    }
+  }
+
+  const templateParams = {
+    submitted_at: new Date().toLocaleString(),
+    guest_email: primaryEmail,
+    guest_list: guestList,
+    ceremony_count: ceremonyCount,
+    reception_count: receptionCount,
+    allergy_notes: allergyNotes || "None"
+  };
+
+  emailjs.send(
+    "service_sg3ulnd",
+    "wedding_rsvp_template",
+    templateParams
+  )
+  .then(() => {
+    alert("Thank you! Your RSVP has been sent 💍");
+    document.getElementById("rsvpForm").reset();
+	emailjs.send(
+  "service_sg3ulnd",
+  "guest_confirmation",
+  { guest_email: primaryEmail }
+);
+	
+	
+  })
+  .catch((error) => {
+    alert("Something went wrong. Please try again.");
+    console.error("EmailJS error:", error);
+  });
+});
+</script>
+
+
+</body>
+</html>
